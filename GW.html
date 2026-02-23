@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Подбор гитары Gopherwood</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#0d1117;color:#e6edf3;min-height:100vh}
+.header{background:linear-gradient(135deg,#0d1117 0%,#161b22 60%,#1c2030 100%);border-bottom:1px solid #c9a84c44;padding:36px 20px;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,#c9a84c18 0%,transparent 65%)}
+.logo{font-size:0.78rem;letter-spacing:4px;text-transform:uppercase;color:#c9a84c;margin-bottom:10px;font-weight:600}
+.header h1{font-size:1.9rem;font-weight:700;color:#e6edf3;letter-spacing:1px;margin-bottom:8px}
+.header h1 span{color:#c9a84c}
+.header p{color:#7d8590;font-size:0.9rem}
+.wrap{max-width:780px;margin:0 auto;padding:30px 16px 60px}
+.prog-wrap{margin-bottom:28px}
+.prog-labels{display:flex;justify-content:space-between;margin-bottom:10px}
+.prog-label{font-size:0.72rem;color:#484f58;text-transform:uppercase;letter-spacing:0.5px;transition:color 0.3s}
+.prog-label.active{color:#c9a84c}
+.prog-bar{height:2px;background:#21262d;border-radius:1px}
+.prog-fill{height:100%;background:linear-gradient(90deg,#c9a84c,#f0c060);border-radius:1px;transition:width 0.45s ease;width:0%}
+.step{display:none}
+.step.show{display:block;animation:fadeUp 0.35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.step-q{font-size:1.25rem;font-weight:600;color:#e6edf3;margin-bottom:6px}
+.step-hint{font-size:0.85rem;color:#7d8590;margin-bottom:22px;line-height:1.5}
+.grid{display:grid;gap:11px}
+.grid.g2{grid-template-columns:1fr 1fr}
+.opt{background:#161b22;border:1.5px solid #30363d;border-radius:13px;padding:17px 16px;cursor:pointer;text-align:left;transition:border-color 0.2s,background 0.2s,transform 0.2s;display:flex;flex-direction:column;gap:3px}
+.opt:hover{background:#1c2230;border-color:#c9a84c88;transform:translateY(-2px)}
+.opt.sel{background:#1a1508;border-color:#c9a84c}
+.opt-ico{font-size:1.5rem;margin-bottom:5px}
+.opt-t{font-size:0.97rem;font-weight:600;color:#e6edf3}
+.opt-d{font-size:0.79rem;color:#7d8590;line-height:1.4;margin-top:2px}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px}
+.btn-back{background:transparent;border:1px solid #30363d;color:#7d8590;padding:10px 20px;border-radius:8px;cursor:pointer;font-size:0.88rem;transition:border-color 0.2s,color 0.2s}
+.btn-back:hover{border-color:#c9a84c;color:#c9a84c}
+.btn-next{background:#c9a84c;border:none;color:#0d1117;padding:12px 28px;border-radius:9px;font-size:0.95rem;font-weight:700;cursor:pointer;transition:background 0.2s,transform 0.2s,opacity 0.2s;opacity:0.35;pointer-events:none}
+.btn-next.on{opacity:1;pointer-events:all}
+.btn-next.on:hover{background:#f0c060;transform:translateY(-2px)}
+.results{display:none}
+.results.show{display:block;animation:fadeUp 0.4s ease}
+.res-head{text-align:center;margin-bottom:28px}
+.res-head h2{font-size:1.45rem;font-weight:700;color:#c9a84c;margin-bottom:8px}
+.res-sum{font-size:0.84rem;color:#7d8590}
+.cards{display:grid;gap:14px}
+.card{background:#161b22;border:1.5px solid #30363d;border-radius:14px;padding:22px;position:relative;transition:border-color 0.2s,transform 0.2s}
+.card:hover{border-color:#c9a84c44;transform:translateY(-2px)}
+.card.top{border-color:#c9a84c}
+.top-badge{position:absolute;top:-11px;right:16px;background:#c9a84c;color:#0d1117;font-size:0.7rem;font-weight:700;padding:3px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px}
+.card-name{font-size:1.28rem;font-weight:700;color:#e6edf3;margin-bottom:3px}
+.card-price{font-size:1.08rem;color:#c9a84c;font-weight:700;margin-bottom:13px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.tag{background:#1c2230;border:1px solid #30363d;padding:4px 10px;border-radius:6px;font-size:0.75rem;color:#8b949e}
+.tag.hl{background:#1a1508;border-color:#c9a84c55;color:#c9a84c}
+.card-note{font-size:0.84rem;color:#7d8590;line-height:1.6}
+.reset{display:block;margin:28px auto 0;background:transparent;border:1.5px solid #30363d;color:#7d8590;padding:12px 34px;border-radius:10px;cursor:pointer;font-size:0.9rem;transition:border-color 0.2s,color 0.2s}
+.reset:hover{border-color:#c9a84c;color:#c9a84c}
+.footer{text-align:center;padding:20px;color:#484f58;font-size:0.75rem;border-top:1px solid #21262d;margin-top:20px}
+.footer a{color:#c9a84c88;text-decoration:none}
+@media(max-width:580px){.grid.g2{grid-template-columns:1fr}.header h1{font-size:1.4rem}.wrap{padding:20px 12px 50px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Gopherwood Guitar Finder</div>
+  <h1>Подберём вашу <span>идеальную гитару</span></h1>
+  <p>Ответьте на 4 вопроса — получите персональную рекомендацию из всей линейки</p>
+</div>
+
+<div class="wrap">
+  <div class="prog-wrap">
+    <div class="prog-labels">
+      <span class="prog-label active" id="pl1">Уровень</span>
+      <span class="prog-label" id="pl2">Бюджет</span>
+      <span class="prog-label" id="pl3">Стиль</span>
+      <span class="prog-label" id="pl4">Электроника</span>
+      <span class="prog-label" id="pl5">Результат</span>
+    </div>
+    <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  </div>
+
+  <!-- ШАГ 1 -->
+  <div class="step show" id="s1">
+    <div class="step-q">Ваш уровень игры</div>
+    <div class="step-hint">Поможет определить нужную серию инструмента</div>
+    <div class="grid g2">
+      <button class="opt" onclick="pick(1,'beg',this)"><span class="opt-ico">🌱</span><span class="opt-t">Начинающий</span><span class="opt-d">Первая гитара, только начинаю учиться</span></button>
+      <button class="opt" onclick="pick(1,'ama',this)"><span class="opt-ico">🎵</span><span class="opt-t">Любитель</span><span class="opt-d">Играю несколько лет, хочу лучше</span></button>
+      <button class="opt" onclick="pick(1,'adv',this)"><span class="opt-ico">🎶</span><span class="opt-t">Продвинутый</span><span class="opt-d">Серьёзный опыт, важны нюансы звука</span></button>
+      <button class="opt" onclick="pick(1,'pro',this)"><span class="opt-ico">🏆</span><span class="opt-t">Профессионал</span><span class="opt-d">Выступления, студия, нужно лучшее</span></button>
+    </div>
+    <div class="nav">
+      <span></span>
+      <button class="btn-next" id="n1" onclick="goNext(1)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ШАГ 2 -->
+  <div class="step" id="s2">
+    <div class="step-q">Ваш бюджет</div>
+    <div class="step-hint">Цены ориентировочные, февраль 2026</div>
+    <div class="grid">
+      <button class="opt" onclick="pick(2,'30k',this)"><span class="opt-t">до 30 000 ₽</span><span class="opt-d">Серия G100 — ламинат, костяные порожки, D'Addario EXP16 в комплекте</span></button>
+      <button class="opt" onclick="pick(2,'50k',this)"><span class="opt-t">30 000 – 50 000 ₽</span><span class="opt-d">Серия G200 / i200 — массив ели, запечённая ель, скос деки (i265)</span></button>
+      <button class="opt" onclick="pick(2,'100k',this)"><span class="opt-t">50 000 – 100 000 ₽</span><span class="opt-d">Серия i300 / K200–K330 — V-гриф, кость в масле, корейская сборка</span></button>
+      <button class="opt" onclick="pick(2,'200k',this)"><span class="opt-t">100 000 – 200 000 ₽</span><span class="opt-d">Серия K700–K940 — полный массив, преамп TGA23D, ручная сборка</span></button>
+      <button class="opt" onclick="pick(2,'200kp',this)"><span class="opt-t">более 200 000 ₽</span><span class="opt-d">Серия K900 — Gotoh 21:1, 5-слойный гриф, палисандр ААА, топ линейки</span></button>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack(2)">← Назад</button>
+      <button class="btn-next" id="n2" onclick="goNext(2)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ШАГ 3 -->
+  <div class="step" id="s3">
+    <div class="step-q">Стиль и цель игры</div>
+    <div class="step-hint">Как вы планируете играть чаще всего?</div>
+    <div class="grid g2">
+      <button class="opt" onclick="pick(3,'strum',this)"><span class="opt-ico">🤘</span><span class="opt-t">Бой и аккорды</span><span class="opt-d">Аккомпанемент, рок, поп, фолк</span></button>
+      <button class="opt" onclick="pick(3,'finger',this)"><span class="opt-ico">🎼</span><span class="opt-t">Фингерстайл / перебор</span><span class="opt-d">Сольное исполнение, мелодические пассажи</span></button>
+      <button class="opt" onclick="pick(3,'classic',this)"><span class="opt-ico">🎹</span><span class="opt-t">Классическая гитара</span><span class="opt-d">Нейлоновые струны, классика, фламенко</span></button>
+      <button class="opt" onclick="pick(3,'travel',this)"><span class="opt-ico">✈️</span><span class="opt-t">Путешествия / компакт</span><span class="opt-d">Нужна лёгкая и компактная гитара</span></button>
+      <button class="opt" style="grid-column:1/-1" onclick="pick(3,'univ',this)"><span class="opt-ico">🎸</span><span class="opt-t">Универсально — всего понемногу</span><span class="opt-d">Один гибкий инструмент и для боя, и для перебора</span></button>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack(3)">← Назад</button>
+      <button class="btn-next" id="n3" onclick="goNext(3)">Далее →</button>
+    </div>
+  </div>
+
+  <!-- ШАГ 4 -->
+  <div class="step" id="s4">
+    <div class="step-q">Нужна ли электроника?</div>
+    <div class="step-hint">Встроенный преамп позволяет подключаться к усилителю, DI-боксу или на сцену</div>
+    <div class="grid">
+      <button class="opt" onclick="pick(4,'yes',this)"><span class="opt-t">🔌 Да, нужна обязательно</span><span class="opt-d">Планирую выступать, записываться или подключаться к усилителю</span></button>
+      <button class="opt" onclick="pick(4,'no',this)"><span class="opt-t">🌲 Нет, только акустика</span><span class="opt-d">Играю дома или на улице без подключения</span></button>
+      <button class="opt" onclick="pick(4,'maybe',this)"><span class="opt-t">🤷 Не принципиально</span><span class="opt-d">Пусть будет, если не сильно влияет на цену</span></button>
+    </div>
+    <div class="nav">
+      <button class="btn-back" onclick="goBack(4)">← Назад</button>
+      <button class="btn-next" id="n4" onclick="showRes()">Получить рекомендацию →</button>
+    </div>
+  </div>
+
+  <!-- РЕЗУЛЬТАТЫ -->
+  <div class="results" id="res">
+    <div class="res-head">
+      <h2>🎸 Ваши рекомендации</h2>
+      <div class="res-sum" id="resSum"></div>
+    </div>
+    <div class="cards" id="cards"></div>
+    <button class="reset" onclick="resetAll()">↺ Начать заново</button>
+  </div>
+
+  <div class="footer">Gopherwood Guitar Finder &nbsp;·&nbsp; Все цены ориентировочные, февраль 2026 &nbsp;·&nbsp; <a href="https://gopherwoodguitar.ru" target="_blank">gopherwoodguitar.ru</a></div>
+</div>
+
+<script>
+var A = {level:null, budget:null, style:null, elec:null};
+var cur = 1;
+
+function pick(step, val, el) {
+  // Снять выбор с других кнопок этого шага
+  var others = document.querySelectorAll('.opt[data-step="' + step + '"]');
+  // Используем перебор всех .opt в том же шаге через родителя
+  var parent = el.parentElement;
+  var siblings = parent.querySelectorAll('.opt');
+  for (var i = 0; i < siblings.length; i++) {
+    siblings[i].classList.remove('sel');
+  }
+  el.classList.add('sel');
+
+  // Сохраняем ответ
+  if (step === 1) A.level = val;
+  if (step === 2) A.budget = val;
+  if (step === 3) A.style = val;
+  if (step === 4) A.elec = val;
+
+  // Активируем кнопку "Далее"
+  var nb = document.getElementById('n' + step);
+  if (nb) nb.classList.add('on');
+}
+
+function goNext(step) {
+  // Проверяем что ответ выбран
+  var keys = {1:'level', 2:'budget', 3:'style', 4:'elec'};
+  if (!A[keys[step]]) return;
+
+  document.getElementById('s' + step).classList.remove('show');
+  document.getElementById('s' + (step + 1)).classList.add('show');
+  cur = step + 1;
+  upProg();
+}
+
+function goBack(step) {
+  document.getElementById('s' + step).classList.remove('show');
+  document.getElementById('s' + (step - 1)).classList.add('show');
+  cur = step - 1;
+  upProg();
+}
+
+function upProg() {
+  document.getElementById('progFill').style.width = ((cur - 1) / 4 * 100) + '%';
+  for (var i = 1; i <= 5; i++) {
+    var el = document.getElementById('pl' + i);
+    if (i <= cur) el.classList.add('active');
+    else el.classList.remove('active');
+  }
+}
+
+function showRes() {
+  if (!A.elec) return;
+  for (var i = 1; i <= 4; i++) {
+    document.getElementById('s' + i).classList.remove('show');
+  }
+  document.getElementById('progFill').style.width = '100%';
+  var labels = document.querySelectorAll('.prog-label');
+  for (var i = 0; i < labels.length; i++) labels[i].classList.add('active');
+
+  var models = getRec();
+  renderCards(models);
+  document.getElementById('res').classList.add('show');
+}
+
+function resetAll() {
+  A = {level:null, budget:null, style:null, elec:null};
+  cur = 1;
+  var opts = document.querySelectorAll('.opt');
+  for (var i = 0; i < opts.length; i++) opts[i].classList.remove('sel');
+  var nexts = document.querySelectorAll('.btn-next');
+  for (var i = 0; i < nexts.length; i++) nexts[i].classList.remove('on');
+  document.getElementById('res').classList.remove('show');
+  document.getElementById('s1').classList.add('show');
+  upProg();
+}
+
+function getRec() {
+  var b = A.budget, s = A.style, e = A.elec;
+  var E = (e === 'yes' || e === 'maybe');
+
+  // КЛАССИКА
+  if (s === 'classic') {
+    if (b === '30k') return [
+      mk('C100','39 000 ₽',['Массив ели','Сапеле','Нейлон','Веерные пружины'],'Самая доступная классика Gopherwood — чуть выше бюджета, но зато массив ели и нейлон.',true)
+    ];
+    if (b === '50k') return [
+      mk('C200','44 000 ₽',['Массив кедра','Сапеле','Нейлон'],'Кедр даёт тёплый округлый тон — классический выбор для нейлоновой гитары. Рекомендуем!',true),
+      mk('C100','39 000 ₽',['Массив ели','Сапеле','Нейлон'],'Ель даёт более яркий и прозрачный звук. Хороший старт.',false)
+    ];
+    if (b === '100k') {
+      var r = [
+        mk('C300','~55 000 ₽',['Массив кедра','Палисандр','Нейлон'],'Кедр + палисандр — профессиональный состав. Серьёзный шаг в тоне.',!E),
+        mk('C200','44 000 ₽',['Массив кедра','Сапеле'],'Хорошая основа для серьёзного изучения классики.',false)
+      ];
+      if (E) r.unshift(mk('C600TCE','94 000 ₽',['Тонкий корпус','Массив ели','Палисандр','Fishman','Вырез','Электроника'],'Тонкий корпус + электроника Fishman = удобно на сцене. Профессиональная концертная классика.',true));
+      return r;
+    }
+    return [
+      mk('C600TRCE','~96 000 ₽',['Тонкий корпус','Массив запечённой ели','Палисандр','Вырез','Электроника'],'Топовая классика Gopherwood. Запечённая ель + палисандр — для профессиональных выступлений.',true),
+      mk('C600TCE','94 000 ₽',['Тонкий корпус','Массив ели','Fishman','Вырез'],'С электроникой Fishman — надёжно на любой сцене.',false)
+    ];
+  }
+
+  // ПУТЕШЕСТВИЯ
+  if (s === 'travel') {
+    if (E) return [
+      mk('e-Trekking','45 000 ₽',['Тревел-гитара','Массив ели','Сапеле','Пьезо + преамп','Мензура 604 мм','Вес 1,05 кг'],'Электроакустическая тревел-гитара. Встроенный преамп — подключается к усилителю. Лёгкая и полноценная.',true),
+      mk('i-Trekking','~35 000 ₽',['Тревел-гитара','Массив ели','Сапеле','Мензура 604 мм','19 ладов'],'Акустическая версия. Массив ели звучит как полноразмерная гитара.',false)
+    ];
+    return [
+      mk('i-Trekking','~35 000 ₽',['Тревел-гитара','Массив ели','Сапеле','Мензура 604 мм','Вес 1,05 кг'],'Лёгкая тревел-гитара с массивом ели. 19 ладов — полноценный инструмент для поездок.',true),
+      mk('i110S GS Mini','29 000 ₽',['GS Mini','Ель','Сапеле','Мензура 596 мм'],'Самый компактный вариант. Удобен для детей и коротких поездок.',false)
+    ];
+  }
+
+  // БОЙ И АККОРДЫ
+  if (s === 'strum') {
+    if (b === '30k') {
+      if (E) return [mk('G130CE','~33 000 ₽',['Гранд Аудиториум','Ламинат ели','Сапеле','Вырез','Электроника'],'Электроакустика начального уровня. Немного выше бюджета, зато сразу можно на сцену.',true)];
+      return [
+        mk('G100 NS','29 000 ₽',['Дредноут','Ламинат ели','Сапеле','Матовая','Костяные порожки'],'Дредноут — громкий и пробивной. Костяные порожки в этой цене редкость. Лучший старт для аккомпанемента.',true),
+        mk('G101 NA','29 000 ₽',['Дредноут','Ламинат ели','Глянцевая'],'То же самое с глянцевой отделкой — более нарядный внешний вид.',false)
+      ];
+    }
+    if (b === '50k') {
+      if (E) return [
+        mk('G330C','43 000 ₽',['Гранд Аудиториум','Массив ели','Палисандр','Вырез','TGA11P'],'Массив ели + палисандр + электроника за 43к — отличное соотношение цена/качество.',true),
+        mk('G230CE','~40 000 ₽',['Гранд Аудиториум','Массив ели','Сапеле','Вырез','Электроника'],'Чуть дешевле. Сапеле вместо палисандра — немного теплее тон.',false)
+      ];
+      return [
+        mk('G200','37 000 ₽',['Дредноут','Массив ситхинской ели','Сапеле','Матовая'],'Массив ели — живой открытый звук, мощный бас. Лучший выбор для боя в этом бюджете.',true),
+        mk('G330C AK','47 000 ₽',['Гранд Аудиториум','Массив ели','Акация Коа','Вырез'],'Акация Коа — экзотический тёплый тон и красивый внешний вид.',false)
+      ];
+    }
+    if (b === '100k') {
+      if (E) return [
+        mk('K330RCE','89 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','V-гриф 44,5 мм','TGA22p','Кость в масле','🇰🇷 Корея'],'Лучший выбор до 100к: корейская сборка, V-гриф, запечённая ель, двухканальный преамп. Конкурент Crafter и Sigma.',true),
+        mk('i320RCE','69 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','TGA-11P','Вырез'],'Чуть дешевле. Запечённая ель + палисандр + электроника.',false)
+      ];
+      return [
+        mk('K250R','66 000 ₽',['Дредноут закруглённых плеч','Запечённая ель','Африканский махагони','V-гриф','Кость в масле'],'Дредноут с закруглёнными плечами — мощный бас, чуть мягче классического дредноута. V-гриф удобен при барре.',true),
+        mk('K230RC','66 000 ₽',['Гранд Аудиториум','Запечённая ель','Африканский махагони','V-гриф','Вырез'],'Если нужен вырез для доступа к верхним ладам.',false)
+      ];
+    }
+    if (b === '200k') return [
+      mk('K800RE','149 000 ₽',['Дредноут','Массив запечённой ели','Массив палисандра','V-гриф','TGA23D','Колки 18:1','🇰🇷 Корея'],'Полный массив ели + палисандра — максимальная проекция и динамика для аккомпанемента.',true),
+      mk('K750RE','135 000 ₽',['Slim Дредноут','Массив запечённой ели','Массив махагони','V-гриф','🇰🇷 Корея'],'Зауженный дредноут — объём дредноута, но чуть компактнее. Тёплый тон махагони.',false),
+      mk('K730RCE','~135 000 ₽',['Гранд Аудиториум','Массив запечённой ели','Массив махагони','Вырез','TGA23D'],'Если нужен вырез + электроника + полный массив.',false)
+    ];
+    return [
+      mk('K900RE','240 000 ₽',['Дредноут','Массив запечённой ели','Палисандр ААА','5-слойный гриф','Gotoh 21:1','🇰🇷 Корея'],'Флагманский дредноут. 5-слойный гриф и японские колки Gotoh — абсолютный топ для аккомпанемента.',true),
+      mk('K940RCE RHOMB','195 000 ₽',['Гранд Аудиториум','Ромбовая система пружин X+Ромб','TGA23D','Флорентийский вырез','Жёсткий кейс'],'Уникальная запатентованная система пружин. Неповторимый характер звука.',false)
+    ];
+  }
+
+  // ФИНГЕРСТАЙЛ
+  if (s === 'finger') {
+    if (b === '30k') return [
+      mk('G110 NS','29 000 ₽',['Оркестра OM','Ламинат ели','Сапеле','Матовая','Порожек 44,5 мм'],'Оркестра — лучший корпус для перебора в начальном сегменте. Широкий порожек 44,5 мм удобен для пальцев.',true),
+      mk('G130C','29 000 ₽',['Гранд Аудиториум','Ламинат ели','Вырез'],'Вырез даёт доступ к верхним ладам — удобно для сольных пассажей.',false)
+    ];
+    if (b === '50k') {
+      if (E) return [
+        mk('i365RCE','49 000 ₽',['Гранд Концерт','Запечённая ель','Палисандр','СКОС ПОД РУКУ ★','TGA-11P','Вырез'],'🌟 Лучший выбор до 50к для фингерстайла! Скос деки + запечённая ель + палисандр + электроника — всё в одной гитаре.',true),
+        mk('i265RC','39 900 ₽',['Гранд Концерт','Массив запечённой ели','Махагони','СКОС ПОД РУКУ ★','Вырез'],'Хит линейки без электроники. Скос + запечённая ель + массив за 39 900 ₽ — лучшее ц/к в линейке.',false)
+      ];
+      return [
+        mk('i265RC','39 900 ₽',['Гранд Концерт','Массив запечённой ели','Махагони','СКОС ПОД РУКУ ★','Вырез'],'🌟 Хит линейки! Скос деки снижает давление на руку, запечённая ель звучит разыгранно сразу из коробки.',true),
+        mk('i265MC','38 000 ₽',['Гранд Концерт','Массив сапеле (топ)','Махагони','СКОС ★','Вырез'],'Тот же скос, но верхняя дека из сапеле — тёплый мягкий тон.',false),
+        mk('i365RCE','49 000 ₽',['Гранд Концерт','Запечённая ель','Палисандр','Скос','Электроника'],'Добавляет палисандр и электронику к уже отличной основе.',false)
+      ];
+    }
+    if (b === '100k') {
+      if (E) return [
+        mk('K330RCE','89 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','V-гриф 44,5 мм','TGA22p','Кость в масле','🇰🇷 Корея'],'Широкий V-гриф 44,5 мм + палисандр — идеально для фингерстайла. Корейская сборка, двухканальный преамп.',true),
+        mk('i320RCE','69 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','TGA-11P'],'Дешевле, с одноканальной электроникой. Хорошая точка входа.',false)
+      ];
+      return [
+        mk('K330RCE','89 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','V-гриф 44,5 мм','Кость в масле','🇰🇷 Корея'],'Широкий V-гриф 44,5 мм и палисандр — отличны для классического фингерстайла. Корейская сборка.',true),
+        mk('i320RCE','69 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','Вырез'],'Хорошее начало для серьёзного фингерстайла.',false)
+      ];
+    }
+    if (b === '200k') return [
+      mk('K810RE','165 000 ₽',['Оркестра OM','Массив запечённой ели','Массив палисандра','V-гриф 44,5 мм','TGA23D','🇰🇷 Корея'],'🏆 Оркестра с полным массивом и палисандром — острый детальный звук с выраженной серединой. Идеал для фингерстайла.',true),
+      mk('K830RCE','166 000 ₽',['Гранд Аудиториум','Массив запечённой ели','Массив палисандра','Вырез','TGA23D'],'ГА с вырезом — чуть универсальнее OM. Тот же полный массив палисандра.',false)
+    ];
+    return [
+      mk('K910RE','243 000 ₽',['Оркестра OM','Массив запечённой ели','Палисандр ААА','5-слойный гриф','Gotoh 21:1','🇰🇷 Корея'],'🏆 Флагманский OM. Gotoh 21:1 и 5-слойный гриф — предельная точность строя и стабильность.',true),
+      mk('K930RCE','245 000 ₽',['Гранд Аудиториум','Палисандр ААА','5-слойный гриф','Gotoh','Венецианский вырез'],'ГА версия топ-серии — объёмнее OM, с вырезом.',false),
+      mk('K940RCE RHOMB','195 000 ₽',['Гранд Аудиториум','Ромбовая система пружин X+Ромб','TGA23D','Флорентийский вырез'],'Уникальная ромбовая система пружин — особый тон, которого нет ни у кого.',false)
+    ];
+  }
+
+  // УНИВЕРСАЛЬНО
+  if (b === '30k') {
+    if (E) return [mk('G130CE','~33 000 ₽',['Гранд Аудиториум','Ламинат','Вырез','Электроника'],'Универсальная форма ГА + вырез + электроника — всё для старта.',true)];
+    return [
+      mk('G130C','29 000 ₽',['Гранд Аудиториум','Ламинат ели','Сапеле','Вырез','Костяные порожки'],'Гранд Аудиториум — самый универсальный корпус. Хорош и для боя, и для перебора.',true),
+      mk('G110 NS','29 000 ₽',['Оркестра OM','Ламинат','Сапеле','Матовая'],'Оркестра чуть компактнее, хорошо звучит при любом стиле.',false)
+    ];
+  }
+  if (b === '50k') {
+    if (E) return [
+      mk('i365RCE','49 000 ₽',['Гранд Концерт','Запечённая ель','Палисандр','Скос деки','TGA-11P','Вырез'],'Максимальный набор функций до 50к: скос, запечённая ель, палисандр, электроника.',true),
+      mk('G330C','43 000 ₽',['Гранд Аудиториум','Массив ели','Палисандр','TGA11P'],'Крупнее корпус — больше объём и проекция.',false)
+    ];
+    return [
+      mk('i265RC','39 900 ₽',['Гранд Концерт','Массив запечённой ели','Махагони','СКОС ★','Вырез'],'🌟 Лучшее ц/к всей линейки. Скос деки + запечённая ель + массив = комфорт и тон.',true),
+      mk('G230C','37 000 ₽',['Гранд Аудиториум','Массив ели','Сапеле','Вырез'],'Больший корпус — больше объём. Хорош и для боя, и для перебора.',false)
+    ];
+  }
+  if (b === '100k') {
+    if (E) return [
+      mk('K330RCE','89 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','V-гриф 44,5 мм','TGA22p','🇰🇷 Корея'],'🏆 Универсальная электроакустика на всю жизнь. Корейская сборка, двухканальный преамп, V-гриф.',true),
+      mk('i320RCE','69 000 ₽',['Гранд Аудиториум','Запечённая ель','Палисандр','TGA-11P'],'На 20к дешевле — хорошая точка входа.',false)
+    ];
+    return [
+      mk('K230RC','66 000 ₽',['Гранд Аудиториум','Запечённая ель','Африканский махагони','V-гриф','Вырез','Кость в масле'],'Первая корейская Gopherwood. V-гриф, вырез, запечённая ель — очень сбалансированный инструмент.',true),
+      mk('K250R','66 000 ₽',['Дредноут закруглённый','Запечённая ель','Африканский махагони','V-гриф'],'Дредноут для тех, кто хочет больше объёма и мощи.',false)
+    ];
+  }
+  if (b === '200k') return [
+    mk('K730RCE','~135 000 ₽',['Гранд Аудиториум','Массив запечённой ели','Массив махагони','Вырез','TGA23D','🇰🇷 Корея'],'Тёплый тон махагони + ГА корпус + вырез — идеально универсальный инструмент на сцене и дома.',true),
+    mk('K830RCE','166 000 ₽',['Гранд Аудиториум','Массив запечённой ели','Массив палисандра','Вырез','TGA23D'],'Ярче и острее за счёт палисандра. Хорош для студии.',false)
+  ];
+  return [
+    mk('K930RCE','245 000 ₽',['Гранд Аудиториум','Палисандр ААА','5-слойный гриф','Gotoh 21:1','Венецианский вырез','🇰🇷 Корея'],'🏆 Универсальный флагман. Вырез, ГА форма, японские колки Gotoh — максимум на все случаи жизни.',true),
+    mk('K940RCE RHOMB','195 000 ₽',['Гранд Аудиториум','Ромбовая система пружин X+Ромб','TGA23D','Флорентийский вырез','Жёсткий кейс'],'Уникальная запатентованная система пружин — для тех, кто хочет чего-то неповторимого.',false)
+  ];
+}
+
+function mk(name, price, tags, note, top) {
+  return {name:name, price:price, tags:tags, note:note, top:top};
+}
+
+function renderCards(models) {
+  var sN = {strum:'бой и аккорды', finger:'фингерстайл', classic:'классическая гитара', travel:'путешествия', univ:'универсально'};
+  var bN = {'30k':'до 30 000 ₽', '50k':'30–50 000 ₽', '100k':'50–100 000 ₽', '200k':'100–200 000 ₽', '200kp':'более 200 000 ₽'};
+  var eN = {yes:'с электроникой', no:'без электроники', maybe:'электроника неважна'};
+  document.getElementById('resSum').textContent = 'Стиль: ' + sN[A.style] + ' · Бюджет: ' + bN[A.budget] + ' · ' + eN[A.elec];
+
+  var c = document.getElementById('cards');
+  c.innerHTML = '';
+  for (var i = 0; i < models.length; i++) {
+    var m = models[i];
+    var d = document.createElement('div');
+    d.className = 'card' + (m.top ? ' top' : '');
+    var tagsHtml = '';
+    for (var j = 0; j < m.tags.length; j++) {
+      tagsHtml += '<span class="tag' + (j === 0 ? ' hl' : '') + '">' + m.tags[j] + '</span>';
+    }
+    d.innerHTML = (m.top ? '<div class="top-badge">⭐ Лучший выбор</div>' : '') +
+      '<div class="card-name">' + m.name + '</div>' +
+      '<div class="card-price">' + m.price + '</div>' +
+      '<div class="tags">' + tagsHtml + '</div>' +
+      '<div class="card-note">' + m.note + '</div>';
+    c.appendChild(d);
+  }
+}
+</script>
+
+</body>
+</html>
